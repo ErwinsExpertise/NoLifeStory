@@ -56,5 +56,5 @@ WORKDIR /data
 # Set the entrypoint to the executable
 ENTRYPOINT ["/usr/local/bin/NoLifeWzToNx"]
 
-# Default command - will list files in /data if no arguments provided
-CMD ["."]
+# Default command shows help when no arguments provided
+CMD []

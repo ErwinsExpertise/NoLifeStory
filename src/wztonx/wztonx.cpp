@@ -21,6 +21,7 @@
 #define VC_EXTRALEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <io.h>
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1073,6 +1074,17 @@ Converts WZ files into NX files
     std::cout << "Took " << std::dec
         << std::chrono::duration_cast<std::chrono::seconds>(b - a).count() << " seconds"
         << std::endl;
-    std::cin.get();
+    // Only wait for input if running interactively (stdin is a terminal)
+#ifdef _WIN32
+    // On Windows, check if stdin is a console
+    if (_isatty(_fileno(stdin))) {
+        std::cin.get();
+    }
+#else
+    // On Unix-like systems, check if stdin is a TTY
+    if (isatty(fileno(stdin))) {
+        std::cin.get();
+    }
+#endif
     std::cerr.rdbuf(old);
 }

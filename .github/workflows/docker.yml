@@ -22,12 +22,9 @@ on:
 jobs:
   build:
     name: Build Docker Image
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
     
     steps:
       - name: Checkout code
