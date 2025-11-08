@@ -368,6 +368,7 @@ struct wztonx {
             in.skip(slen * 2u);
             if (slen > std::numeric_limits<uint16_t>::max()) { return add_string("This string was too long."); }
             auto mask = 0xAAAAu;
+            wstr_buf.clear();
             wstr_buf.resize(slen);
             for (auto i = 0u; i < std::min(slen, 0x10000u); ++i) {
                 wstr_buf[i] = static_cast<char16_t>(ows[i] ^ u16key[i] ^ mask);
@@ -396,6 +397,7 @@ struct wztonx {
             }
             if (std::any_of(str_buf.begin(), str_buf.end(),
                 [](char const & c) { return static_cast<uint8_t>(c) >= 0x80; })) {
+                wstr_buf.clear();
                 std::transform(str_buf.cbegin(), str_buf.cend(), std::back_inserter(wstr_buf),
                     [](char c) { return cp1252[static_cast<unsigned char>(c)]; });
                 return add_string(convert_str(wstr_buf));
