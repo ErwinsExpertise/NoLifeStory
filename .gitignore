@@ -16,3 +16,9 @@
 !build/*.vcxproj
 !build/*.vcxproj.filters
 !build/*.props
+!Dockerfile
+!.dockerignore
+!.github/
+!.github/**
+!.github/**/*.yml
+!.github/**/*.yaml

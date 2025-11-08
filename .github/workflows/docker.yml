@@ -1,0 +1,88 @@
+name: Docker Build and Test
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'src/wztonx/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/docker.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'src/wztonx/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/docker.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: nolifewztonx:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Test Docker image - Run help
+        run: |
+          docker run --rm nolifewztonx:test
+
+      - name: Test Docker image - Check binary exists
+        run: |
+          docker run --rm nolifewztonx:test --version || docker run --rm --entrypoint /bin/sh nolifewztonx:test -c "ls -la /usr/local/bin/NoLifeWzToNx"
+
+      - name: Display image info
+        run: |
+          docker images nolifewztonx:test
+          docker inspect nolifewztonx:test --format='{{.Size}}' | awk '{print "Image size: " $1/1024/1024 " MB"}'
+
+  multi-platform-build:
+    name: Multi-Platform Build Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build multi-platform Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: false
+          tags: nolifewztonx:multi
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
