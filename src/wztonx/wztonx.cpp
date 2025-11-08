@@ -361,6 +361,11 @@ struct wztonx {
         auto len = in.read<int8_t>();
         if (len > 0) {
             auto slen = len == 127 ? in.read<uint32_t>() : len;
+            // Add bounds check to prevent allocation of excessively large strings
+            // Maximum reasonable string length is 10MB
+            if (slen > 10485760) {
+                throw std::runtime_error("String length exceeds maximum allowed size: " + std::to_string(slen));
+            }
             auto ows = reinterpret_cast<char16_t const *>(in.offset);
             in.skip(slen * 2u);
             auto mask = 0xAAAAu;
@@ -377,6 +382,11 @@ struct wztonx {
         }
         if (len < 0) {
             auto slen = len == -128 ? in.read<uint32_t>() : -len;
+            // Add bounds check to prevent allocation of excessively large strings
+            // Maximum reasonable string length is 10MB
+            if (slen > 10485760) {
+                throw std::runtime_error("String length exceeds maximum allowed size: " + std::to_string(slen));
+            }
             auto os = reinterpret_cast<char8_t const *>(in.offset);
             in.skip(slen);
             auto mask = 0xAAu;
