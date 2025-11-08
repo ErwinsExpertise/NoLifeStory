@@ -4,7 +4,19 @@ A group of C++ projects that have no life.
 
 ## Quick Start with Docker 🐳
 
-The easiest way to use NoLifeWzToNx across all platforms (Linux, Windows, macOS) is with Docker:
+The easiest way to use NoLifeWzToNx across all platforms (Linux, Windows, macOS) is with Docker.
+
+**Option 1: Use pre-built image from GitHub Container Registry:**
+
+```bash
+# Pull the image
+docker pull ghcr.io/erwinsexpertise/nolifestory:latest
+
+# Convert a WZ file (e.g., Data.wz) to NX format
+docker run --rm -v "$(pwd):/data" ghcr.io/erwinsexpertise/nolifestory:latest Data.wz --client
+```
+
+**Option 2: Build from source:**
 
 ```bash
 # Build the Docker image

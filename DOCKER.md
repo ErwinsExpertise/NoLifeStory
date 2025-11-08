@@ -9,9 +9,28 @@ This guide explains how to use Docker to build and run NoLifeWzToNx for converti
 
 ## Quick Start
 
-### 1. Build the Docker Image
+### Option 1: Pull Pre-built Image from GHCR (Recommended)
 
-From the repository root directory:
+The easiest way to get started is to pull the pre-built image from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/erwinsexpertise/nolifestory:latest
+```
+
+Then use it with:
+
+```bash
+docker run --rm -v "$(pwd):/data" ghcr.io/erwinsexpertise/nolifestory:latest Data.wz --client
+```
+
+**Benefits:**
+- No build time required
+- Multi-platform support (amd64, arm64)
+- Automatically updated on each release
+
+### Option 2: Build the Docker Image Locally
+
+If you prefer to build from source, from the repository root directory:
 
 ```bash
 docker build -t nolifewztonx .
@@ -20,6 +39,22 @@ docker build -t nolifewztonx .
 This creates a Docker image named `nolifewztonx` with all dependencies included.
 
 ### 2. Convert WZ Files
+
+#### Using Pre-built Image from GHCR
+
+If you pulled the image from GHCR:
+
+```bash
+docker run --rm -v "$(pwd):/data" ghcr.io/erwinsexpertise/nolifestory:latest Data.wz --client
+```
+
+#### Using Locally Built Image
+
+If you built the image locally:
+
+```bash
+docker run --rm -v "$(pwd):/data" nolifewztonx Data.wz --client
+```
 
 #### Basic Usage (Current Directory)
 
@@ -167,8 +202,30 @@ The Docker image works on:
 ## Image Details
 
 - **Base Image**: Ubuntu 22.04 LTS
-- **Size**: ~150 MB (runtime image)
+- **Size**: ~83 MB (runtime image)
 - **Architecture**: Multi-platform support (amd64, arm64)
+- **Registry**: GitHub Container Registry (GHCR)
+
+### Available Image Tags
+
+The image is published to `ghcr.io/erwinsexpertise/nolifestory` with the following tags:
+
+- `latest` - Latest build from the main/master branch
+- `main` or `master` - Latest build from the respective branch
+- `v1.0.0`, `v1.0`, `v1` - Semantic version tags (when releases are created)
+- `main-sha-<commit>` - Specific commit builds
+
+**Example:**
+```bash
+# Pull latest version
+docker pull ghcr.io/erwinsexpertise/nolifestory:latest
+
+# Pull specific version
+docker pull ghcr.io/erwinsexpertise/nolifestory:v1.0.0
+
+# Pull specific commit
+docker pull ghcr.io/erwinsexpertise/nolifestory:main-sha-abc1234
+```
 
 ## Getting Help
 
