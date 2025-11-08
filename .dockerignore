@@ -1,0 +1,56 @@
+# Docker ignore file - excludes unnecessary files from Docker build context
+# This speeds up builds and reduces image size
+
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation (not needed in build)
+*.md
+!README.md
+TODO.md
+LICENSE.txt
+
+# Build artifacts
+build/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# IDE files
+.vs
+.vscode
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+
+# Test and benchmark files (not needed for wztonx)
+src/client/
+src/nxbench/
+src/nxedit/
+
+# SDK and external dependencies (will be installed via apt)
+sdk/
+
+# NX and WZ files
+*.nx
+*.wz
+*.img
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
