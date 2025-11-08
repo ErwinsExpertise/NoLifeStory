@@ -54,7 +54,7 @@ namespace sys = boost::filesystem;
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <locale>
+#include <clocale>
 #include <map>
 #include <numeric>
 #include <regex>
@@ -321,7 +321,7 @@ struct wztonx {
     std::string str_buf;
     std::u16string wstr_buf;
 #ifndef NL_NO_CODECVT
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 #endif
     char8_t const * u8key = nullptr;
     char16_t const * u16key = nullptr;
@@ -338,8 +338,7 @@ struct wztonx {
     // Methods
     std::string convert_str(std::u16string const & p_str) {
 #ifndef NL_NO_CODECVT
-        auto ptr = reinterpret_cast<wchar_t const *>(p_str.c_str());
-        return convert.to_bytes(ptr, ptr + p_str.size());
+        return convert.to_bytes(p_str);
 #else
         std::array<char, 0x10000> buf;
         std::wstring wbuf{p_str.cbegin(), p_str.cend()};
@@ -348,6 +347,8 @@ struct wztonx {
 #endif
     }
     id_t add_string(std::string str) {
+        if (str.length() > std::numeric_limits<uint16_t>::max())
+            return add_string("This string was too long.");
         uint32_t hash = 2166136261u;
         for (auto c : str) {
             hash ^= c;
@@ -365,6 +366,7 @@ struct wztonx {
             auto slen = len == 127 ? in.read<uint32_t>() : len;
             auto ows = reinterpret_cast<char16_t const *>(in.offset);
             in.skip(slen * 2u);
+            if (slen > std::numeric_limits<uint16_t>::max()) { return add_string("This string was too long."); }
             auto mask = 0xAAAAu;
             wstr_buf.resize(slen);
             for (auto i = 0u; i < std::min(slen, 0x10000u); ++i) {
@@ -381,6 +383,7 @@ struct wztonx {
             auto slen = len == -128 ? in.read<uint32_t>() : -len;
             auto os = reinterpret_cast<char8_t const *>(in.offset);
             in.skip(slen);
+            if (slen > std::numeric_limits<uint16_t>::max()) { return add_string("This string was too long."); }
             auto mask = 0xAAu;
             str_buf.resize(slen);
             for (auto i = 0u; i < std::min(slen, 0x10000u); ++i) {
