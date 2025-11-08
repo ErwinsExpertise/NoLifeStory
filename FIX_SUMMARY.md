@@ -47,6 +47,21 @@ if (std::any_of(str_buf.begin(), str_buf.end(),
 - **Surgical fix:** Only touches the problematic function
 - **Backward compatible:** No API or behavior changes
 
+## Additional Improvements (2025-11-08)
+
+### LZ4 API Modernization
+Updated to use modern, non-deprecated LZ4 compression functions:
+- Replaced `LZ4_compressHC()` → `LZ4_compress_HC()` with proper parameters
+- Replaced `LZ4_compress()` → `LZ4_compress_default()` with proper parameters
+- Added compression level and destination capacity parameters for better safety
+- Eliminates all deprecation warnings during compilation
+
+### Code Quality
+- Build completes without deprecation warnings (only informational C++20 char8_t compatibility note remains)
+- All error handling uses exceptions for consistent error propagation
+- Proper bounds checking on string lengths to prevent overflows
+- Node sorting remains disabled (critical - sorting breaks NX file functionality for client tools)
+
 ## Testing
 See [TESTING.md](TESTING.md) for detailed testing procedures.
 
