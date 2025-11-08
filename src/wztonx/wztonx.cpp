@@ -363,6 +363,8 @@ struct wztonx {
         auto len = in.read<int8_t>();
         if (len > 0) {
             auto slen = len == 127 ? in.read<uint32_t>() : len;
+            // Validate string length to prevent std::length_error
+            if (slen > 0x1ffff) throw std::runtime_error("String is too long: " + std::to_string(slen));
             auto ows = reinterpret_cast<char16_t const *>(in.offset);
             in.skip(slen * 2u);
             auto mask = 0xAAAAu;
@@ -379,6 +381,8 @@ struct wztonx {
         }
         if (len < 0) {
             auto slen = len == -128 ? in.read<uint32_t>() : -len;
+            // Validate string length to prevent std::length_error
+            if (slen > 0x1ffff) throw std::runtime_error("String is too long: " + std::to_string(slen));
             auto os = reinterpret_cast<char8_t const *>(in.offset);
             in.skip(slen);
             auto mask = 0xAAu;
