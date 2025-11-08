@@ -178,8 +178,10 @@ struct imapfile {
         if (fstat(file_handle, &finfo) == -1)
             throw std::runtime_error("Failed to obtain file information of file " + p);
         file_size = finfo.st_size;
+        // Use MAP_PRIVATE instead of MAP_SHARED to avoid issues with Docker volume mounts
+        // MAP_PRIVATE is suitable for read-only access and works better with mounted filesystems
         base = reinterpret_cast<char const *>(
-            mmap(nullptr, file_size, PROT_READ, MAP_SHARED, file_handle, 0));
+            mmap(nullptr, file_size, PROT_READ, MAP_PRIVATE, file_handle, 0));
         if (reinterpret_cast<intptr_t>(base) == -1)
             throw std::runtime_error("Failed to create memory mapping of file " + p);
         offset = base;
@@ -361,11 +363,6 @@ struct wztonx {
         auto len = in.read<int8_t>();
         if (len > 0) {
             auto slen = len == 127 ? in.read<uint32_t>() : len;
-            // Add bounds check to prevent allocation of excessively large strings
-            // Maximum reasonable string length is 10MB
-            if (slen > 10485760) {
-                throw std::runtime_error("String length exceeds maximum allowed size: " + std::to_string(slen));
-            }
             auto ows = reinterpret_cast<char16_t const *>(in.offset);
             in.skip(slen * 2u);
             auto mask = 0xAAAAu;
@@ -382,11 +379,6 @@ struct wztonx {
         }
         if (len < 0) {
             auto slen = len == -128 ? in.read<uint32_t>() : -len;
-            // Add bounds check to prevent allocation of excessively large strings
-            // Maximum reasonable string length is 10MB
-            if (slen > 10485760) {
-                throw std::runtime_error("String length exceeds maximum allowed size: " + std::to_string(slen));
-            }
             auto os = reinterpret_cast<char8_t const *>(in.offset);
             in.skip(slen);
             auto mask = 0xAAu;
