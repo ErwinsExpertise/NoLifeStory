@@ -993,12 +993,13 @@ struct wztonx {
             uint32_t final_size;
             if (hc) {
                 final_size = static_cast<uint32_t>(
-                    LZ4_compressHC(reinterpret_cast<char const *>(input.data()),
-                        reinterpret_cast<char *>(output.data()), size));
+                    LZ4_compress_HC(reinterpret_cast<char const *>(input.data()),
+                        reinterpret_cast<char *>(output.data()), size, 
+                        static_cast<int>(output.size()), LZ4HC_CLEVEL_DEFAULT));
             } else {
                 final_size = static_cast<uint32_t>(
-                    LZ4_compress(reinterpret_cast<char const *>(input.data()),
-                        reinterpret_cast<char *>(output.data()), size));
+                    LZ4_compress_default(reinterpret_cast<char const *>(input.data()),
+                        reinterpret_cast<char *>(output.data()), size, static_cast<int>(output.size())));
             }
             bitmap_offset += final_size + 4;
             file.write(reinterpret_cast<char const *>(&final_size), 4);
