@@ -711,7 +711,6 @@ struct wztonx {
         finish_parse();
     }
     void finish_parse() {
-        for (auto const & n : nodes_to_sort) sort_nodes(n.first, n.second);
         find_uols(0);
         for (;;) {
             auto it = std::remove_if(uols.begin(), uols.end(), [this](std::vector<id_t> const & v) {
