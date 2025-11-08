@@ -178,8 +178,10 @@ struct imapfile {
         if (fstat(file_handle, &finfo) == -1)
             throw std::runtime_error("Failed to obtain file information of file " + p);
         file_size = finfo.st_size;
+        // Use MAP_PRIVATE instead of MAP_SHARED to avoid issues with Docker volume mounts
+        // MAP_PRIVATE is suitable for read-only access and works better with mounted filesystems
         base = reinterpret_cast<char const *>(
-            mmap(nullptr, file_size, PROT_READ, MAP_SHARED, file_handle, 0));
+            mmap(nullptr, file_size, PROT_READ, MAP_PRIVATE, file_handle, 0));
         if (reinterpret_cast<intptr_t>(base) == -1)
             throw std::runtime_error("Failed to create memory mapping of file " + p);
         offset = base;
